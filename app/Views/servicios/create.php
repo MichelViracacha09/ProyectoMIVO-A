@@ -74,9 +74,7 @@
                 <div class="mb-4">
                     <label class="form-label">Tipo de servicio</label>
                     <select name="id_tipo_servicio" class="form-select" required>
-                        <option value="1">Mantenimiento preventivo</option>
-                        <option value="2">Mantenimiento correctivo</option>
-                        <option value="3">Diagnóstico general</option>
+                        <?php foreach ($tipos as $t): ?><option value="<?= $t['id_tipo_servicio'] ?>" <?= (string) old('id_tipo_servicio') === (string) $t['id_tipo_servicio'] ? 'selected' : '' ?>><?= esc($t['nombre']) ?></option><?php endforeach; ?>
                     </select>
                 </div>
 
