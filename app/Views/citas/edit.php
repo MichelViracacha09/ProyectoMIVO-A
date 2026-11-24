@@ -46,6 +46,10 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label">Observaciones</label>
+                    <textarea name="observaciones" class="form-control" rows="2" maxlength="255"><?= esc(old('observaciones', $cita['servicio_a_realizar'] ?? '')) ?></textarea>
+                </div>
                 <?php if ($esAdmin): ?>
                     <div class="mb-4">
                         <label class="form-label">Estado de la cita</label>
