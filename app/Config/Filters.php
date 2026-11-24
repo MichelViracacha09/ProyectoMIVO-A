@@ -35,6 +35,9 @@ class Filters extends BaseFilters
         'pagecache'      => PageCache::class,
         'performance'    => PerformanceMetrics::class,
         'authCheck'      => \App\Filters\AuthFilter::class,
+        'role'           => \App\Filters\RoleFilter::class,
+        'apiAuth'        => \App\Filters\ApiAuthFilter::class,
+        'permiso'        => \App\Filters\PermisoFilter::class,
     ];
         public array $filters = [
         'authCheck' => [
@@ -47,6 +50,10 @@ class Filters extends BaseFilters
                 'motos*',
                 'citas*',
                 'servicios*',
+                'clientes*',
+                'usuarios*',
+                'roles*',
+                'permisos*',
             ]
         ]
     ];
@@ -87,7 +94,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            'csrf' => ['except' => ['api/*']],
             // 'invalidchars',
         ],
         'after' => [
