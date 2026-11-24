@@ -37,6 +37,11 @@ class Auth extends BaseController
                     return redirect()->back()->with('error', 'Su cuenta se encuentra: ' . $user['estado']);
                 }
 
+                // Cliente inactivo (2) o bloqueado (3) según estado_cliente no puede ingresar
+                if (!empty($user['id_cliente']) && (int) $user['id_estado_cliente'] !== 1) {
+                    return redirect()->back()->with('error', 'Su cuenta de cliente no está activa. Contacte al taller.');
+                }
+
                 // Detectar si es administrador o cliente
                 $esAdmin = !empty($user['id_administrador']);
 
@@ -57,7 +62,13 @@ class Auth extends BaseController
                     $sessionData['id_cliente'] = (int) $user['id_cliente'];
                 }
 
+                // Evita la fijación de sesión: nuevo id de sesión tras autenticarse
+                $session->regenerate(true);
                 $session->set($sessionData);
+
+                if ($esAdmin) {
+                    (new \App\Models\AdministradorModel())->update((int) $user['id_administrador'], ['ultimo_acceso' => date('Y-m-d H:i:s')]);
+                }
 
                 return redirect()->to('/home')->with('success', 'Bienvenido al sistema.');
             }
@@ -83,7 +94,8 @@ class Auth extends BaseController
             'nombre_completo'       => 'required|min_length[3]',
             'numero_identificacion' => 'required|is_unique[cliente.numero_identificacion]',
             'correo_electronico'    => 'required|valid_email|is_unique[cliente.correo_electronico]',
-            'numero_celular'        => 'required',
+            'numero_celular'        => 'required|regex_match[/^\+?[0-9]{7,15}$/]',
+            'id_identificacion'     => 'required|integer|is_not_unique[tipo_identificacion.id_identificacion]',
             'password'              => 'required|min_length[6]',
         ];
 
@@ -92,6 +104,11 @@ class Auth extends BaseController
         }
 
         $db = \Config\Database::connect();
+
+        // El correo también es el usuario de acceso: no puede coincidir con el de un administrador
+        if ($db->table('administrador')->where('correo', $this->request->getPost('correo_electronico'))->countAllResults() > 0) {
+            return redirect()->back()->withInput()->with('errors', ['correo_electronico' => 'Ese correo ya está registrado.']);
+        }
         $db->transStart();
 
         $usuarioModel = new UsuarioModel();
