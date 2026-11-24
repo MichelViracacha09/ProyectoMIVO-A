@@ -1,0 +1,5 @@
+$kind: http-request
+url: http://localhost:8080
+method: GET
+examples: .resources/Verificar página de inicio.resources/examples
+order: 1000
